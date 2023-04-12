@@ -3,9 +3,9 @@
   content: "Buscar";
 }
 .my-textarea {
-  font-size: 25px;
+  font-size: 15px;
   width:700px;
-
+  height: 125px;
 }
 .page {
   color: white;
@@ -26,9 +26,7 @@
     font-size: 2rem;
     overflow: auto;
     &-data {
-
       left: 20%;
-
     }
   }
 }

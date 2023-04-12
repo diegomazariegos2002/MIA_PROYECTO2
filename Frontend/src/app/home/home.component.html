@@ -6,12 +6,12 @@
         <div class="form-group">
           <label for="exampleFormControlFile1" class="font-weight-bold" style="font-size: 50%;">Selecciona un archivo</label>
           <div class="custom-file">
-            <input type="file" class="custom-file-input" id="exampleFormControlFile1" style="font-size: 50%;">
+            <input type="file" class="custom-file-input" (change)="onFileSelected($event)" accept=".eea" id="exampleFormControlFile1" style="font-size: 50%;">
           </div>
         </div>
       </form>
       <br>
-      <button type="button" class="btn btn-outline-primary">Ejecutar</button>
+      <button type="button" class="btn btn-outline-primary" (click)="compilar()">Ejecutar</button>
       <br>
       <br>
       <div class="form-group">
