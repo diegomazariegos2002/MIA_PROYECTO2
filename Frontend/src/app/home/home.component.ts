@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {UserService} from "../services/user.service";
 
 @Component({
   selector: 'app-home',
@@ -9,12 +10,10 @@ export class HomeComponent implements OnInit {
   consola: any =
     {
       entrada: '',
-      salida: '',
-      errores: [],
-      simbolos: []
+      salida: ''
     }
   archivoSeleccionado: File|null = null;
-  constructor() { }
+  constructor(private service: UserService) { }
   ngOnInit(): void {
   }
 
@@ -27,7 +26,7 @@ export class HomeComponent implements OnInit {
       lector.readAsText(this.archivoSeleccionado);
       lector.onload = (e) => {
         if (e.target && e.target.result) {
-          this.mostrarContenido(e.target.result.toString());
+          this.consola.entrada = e.target.result.toString()
         }
       }
     } else {
@@ -35,14 +34,24 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  mostrarContenido(contenido: string) {
-    const textarea = document.getElementById('exampleFormControlTextarea1');
-    if (textarea) {
-      textarea.innerHTML = contenido;
-    }
-  }
-
   compilar() {
+    this.service.getIndex().subscribe(
+      {
+        next: (res) => {console.log(res)},
+        error: (err) => {console.log(err)},
+        complete: () => {}
+      } )
 
+    this.service.compilar(this.consola).subscribe(
+      {
+        next: (res: any) => {
+          console.log(res);
+          const JsonRespuesta = JSON.parse(JSON.stringify(res))
+          this.consola.salida = JsonRespuesta.salida
+        },
+        error: (err: any) => { console.log(err) },
+        complete: () => {}
+      }
+    )
   }
 }

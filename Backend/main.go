@@ -1,11 +1,15 @@
 package main
 
 import (
+	"./singleton"
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/gin-contrib/cors"
@@ -29,6 +33,7 @@ func main() {
 	// Definiendo rutas del array routes
 	routes := []Route{
 		{"/", indexHandler, "GET"},
+		{"/compilar", compilar, "POST"},
 	}
 
 	// Crea cada ruta del array routes
@@ -74,6 +79,53 @@ func main() {
 // definition of routes
 func indexHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
-		"message": "Hola mundo",
+		"message": "Server corriendo",
 	})
+}
+
+func compilar(c *gin.Context) {
+	var data map[string]interface{}           // un mapa para guardar los datos del cuerpo
+	if err := c.BindJSON(&data); err != nil { // intentar leer el cuerpo como JSON
+		c.JSON(400, gin.H{"error": err.Error()}) // si hay un error, enviar respuesta 400
+		return
+	}
+	var entradaConsola string
+	var singleton = singleton.GetInstance()
+	singleton.ResetSalidaConsola()
+	if s, ok := data["entrada"].(string); ok { // verificar si el campo entrada existe
+		entradaConsola = s
+		reader := bufio.NewReader(strings.NewReader(entradaConsola))
+		for {
+			lectura, err := reader.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					singleton.AddSalidaConsola("FIN DE LA ENTRADA\n")
+					break
+				}
+				singleton.AddSalidaConsola("Error al leer entrada de usuario: " + err.Error() + "\n")
+				continue
+			}
+			lectura = strings.TrimSpace(lectura) // eliminar /t/n/_ de los bordes
+
+			// Aquí va la parte del analizador
+
+			// Verificar si se llegó al final de la entrada
+			if _, err := reader.Peek(1); err != nil {
+				if err == io.EOF {
+					singleton.AddSalidaConsola("FIN DE LA ENTRADA\n")
+					break
+				}
+				singleton.AddSalidaConsola("Error al leer entrada de usuario: " + err.Error() + "\n")
+				continue
+			}
+		}
+		c.JSON(200, gin.H{"message": "Datos recibidos", "salida": singleton.SalidaConsola()}) // si todo está bien, enviar respuesta 200 con los datos
+		return
+	} else {
+		c.JSON(400, gin.H{"error": "error con la entrada"}) // si hay un error, enviar respuesta 400
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Datos recibidos", "salida": "vacio"}) // si todo está bien, enviar respuesta 200 con los datos
+	return
 }

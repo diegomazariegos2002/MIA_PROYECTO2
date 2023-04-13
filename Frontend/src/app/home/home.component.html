@@ -15,11 +15,11 @@
       <br>
       <br>
       <div class="form-group">
-        <textarea class="form-control my-textarea" id="exampleFormControlTextarea1" rows="3" placeholder="Ingrese comando aqui."></textarea>
+        <textarea [(ngModel)]="consola.entrada" class="form-control my-textarea" id="exampleFormControlTextarea1" rows="3" placeholder="Ingrese comando aqui."></textarea>
       </div>
       <br>
       <div class="form-group">
-        <textarea class="form-control my-textarea" id="exampleFormControlTextarea2" rows="3" placeholder="salida"></textarea>
+        <textarea [(ngModel)]="consola.salida" class="form-control my-textarea" id="exampleFormControlTextarea2" rows="3" placeholder="salida"></textarea>
       </div>
     </div>
   </div>
