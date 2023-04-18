@@ -1,11 +1,12 @@
 package main
 
 import (
-	"./singleton"
 	"bufio"
 	"context"
 	"fmt"
 	"io"
+	"miapp/analizador"
+	"miapp/singleton"
 	"net/http"
 	"os"
 	"os/signal"
@@ -89,14 +90,14 @@ func compilar(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()}) // si hay un error, enviar respuesta 400
 		return
 	}
-	var entradaConsola string
+	var entryConsole string
 	var singleton = singleton.GetInstance()
 	singleton.ResetSalidaConsola()
 	if s, ok := data["entrada"].(string); ok { // verificar si el campo entrada existe
-		entradaConsola = s
-		reader := bufio.NewReader(strings.NewReader(entradaConsola))
+		entryConsole = s
+		reader := bufio.NewReader(strings.NewReader(entryConsole))
 		for {
-			lectura, err := reader.ReadString('\n')
+			line, err := reader.ReadString('\n')
 			if err != nil {
 				if err == io.EOF {
 					singleton.AddSalidaConsola("FIN DE LA ENTRADA\n")
@@ -105,14 +106,17 @@ func compilar(c *gin.Context) {
 				singleton.AddSalidaConsola("Error al leer entrada de usuario: " + err.Error() + "\n")
 				continue
 			}
-			lectura = strings.TrimSpace(lectura) // eliminar /t/n/_ de los bordes
+			line = strings.TrimSpace(line) // eliminar /t/n/_ de los bordes
 
-			// Aquí va la parte del analizador
+			// Aquí va la parte del analyzer
+			var analyzer = analizador.NewAnalizador(line + " ") // agrego el " " de ultimo para evitar errores
+			singleton.AddSalidaConsola("//" + analyzer.Entrada + "\n")
+			analyzer.AnalizarEntrada()
 
 			// Verificar si se llegó al final de la entrada
 			if _, err := reader.Peek(1); err != nil {
 				if err == io.EOF {
-					singleton.AddSalidaConsola("FIN DE LA ENTRADA\n")
+					singleton.AddSalidaConsola("=======FIN DE LA ENTRADA=======\n")
 					break
 				}
 				singleton.AddSalidaConsola("Error al leer entrada de usuario: " + err.Error() + "\n")

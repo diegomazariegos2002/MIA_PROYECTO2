@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit {
   }
 
   compilar() {
+    console.log(this.consola)
     this.service.getIndex().subscribe(
       {
         next: (res) => {console.log(res)},

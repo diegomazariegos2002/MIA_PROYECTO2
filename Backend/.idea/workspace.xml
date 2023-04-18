@@ -4,12 +4,17 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="empezando pues">
-      <change afterPath="$PROJECT_DIR$/singleton/singleton.go" afterDir="false" />
+    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="primera parte analizador">
+      <change afterPath="$PROJECT_DIR$/analizador/Analizador.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comandos/Disco.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comandos/Particion.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comandos/Structs.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/singleton/Singleton.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/src/app/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/src/app/app.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/src/app/home/home.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/src/app/home/home.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/singleton/singleton.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../Frontend/src/app/home/home.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/src/app/home/home.component.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,7 +58,7 @@
     "nodejs_package_manager_path": "npm",
     "rearrange.code.on.save": "true",
     "settings.build.tools.auto.reload": "ALL",
-    "settings.editor.selected.configurable": "watcher.settings"
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -65,6 +70,7 @@
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="Backend" />
       <working_directory value="$PROJECT_DIR$" />
+      <sudo value="true" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
@@ -108,17 +114,10 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="empezando pues" />
-    <option name="LAST_COMMIT_MESSAGE" value="empezando pues" />
+    <MESSAGE value="primera parte analizador" />
+    <option name="LAST_COMMIT_MESSAGE" value="primera parte analizador" />
   </component>
   <component name="VgoProject">
-    <integration-enabled>false</integration-enabled>
     <settings-migrated>true</settings-migrated>
-  </component>
-  <component name="XDebuggerManager">
-    <watches-manager>
-      <configuration name="GoApplicationRunConfiguration">
-        <watch expression="lectura" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>
