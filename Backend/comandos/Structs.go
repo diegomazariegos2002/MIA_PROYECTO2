@@ -3,29 +3,29 @@ package comandos
 import "time"
 
 type Partition struct {
-	part_status byte
-	part_type   byte
-	part_fit    byte
-	part_start  int32
-	part_s      int32
-	part_name   [16]byte
+	Part_status byte
+	Part_type   byte
+	Part_fit    byte
+	Part_start  int
+	Part_s      int
+	Part_name   [16]byte
 }
 
 type MBR struct {
-	mbr_tamano         int32
-	mbr_fecha_creacion time.Time // recordar que al convertir el tiempo ejemplo: fechaFormateada := mbr.mbr_fecha_creacion.Format("2006-01-02 15:04:05")
-	mbr_dsk_signature  int32
-	disk_fit           byte
-	mbr_partition      [4]Partition
+	Mbr_tamano         int32
+	Mbr_fecha_creacion time.Time // recordar que al convertir el tiempo ejemplo: fechaFormateada := mbr.mbr_fecha_creacion.Format("2006-01-02 15:04:05")
+	Mbr_dsk_signature  int32
+	Disk_fit           byte
+	Mbr_partition      [4]Partition
 }
 
 type EBR struct {
-	part_status byte
-	part_fit    byte
-	part_start  int32
-	part_s      int32
-	part_next   int32
-	part_name   [16]byte
+	Part_status byte
+	Part_fit    byte
+	Part_start  int
+	Part_s      int
+	Part_next   int
+	Part_name   [16]byte
 }
 
 type SuperBloque struct {

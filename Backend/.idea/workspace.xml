@@ -4,18 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="primera parte analizador">
-      <change afterPath="$PROJECT_DIR$/analizador/Analizador.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comandos/Disco.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comandos/Particion.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comandos/Structs.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/singleton/Singleton.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/singleton/singleton.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/src/app/home/home.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/src/app/home/home.component.ts" afterDir="false" />
+    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="mkdisk, rmdisk y comienzo fdisk">
+      <change beforePath="$PROJECT_DIR$/analizador/Analizador.go" beforeDir="false" afterPath="$PROJECT_DIR$/analizador/Analizador.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Disco.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Disco.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Particion.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Particion.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Structs.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +51,7 @@
     "nodejs_package_manager_path": "npm",
     "rearrange.code.on.save": "true",
     "settings.build.tools.auto.reload": "ALL",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "settings.editor.selected.configurable": "editor.preferences.smartKeys"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -115,7 +108,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="empezando pues" />
     <MESSAGE value="primera parte analizador" />
-    <option name="LAST_COMMIT_MESSAGE" value="primera parte analizador" />
+    <MESSAGE value="mkdisk, rmdisk y comienzo fdisk" />
+    <option name="LAST_COMMIT_MESSAGE" value="mkdisk, rmdisk y comienzo fdisk" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

@@ -88,13 +88,13 @@ func (d *Disco) Mkdisk() {
 			defer file.Close()
 
 			var mbr MBR
-			mbr.mbr_fecha_creacion = time.Now()
-			mbr.mbr_dsk_signature = int32(int(time.Now().Unix()))
-			mbr.mbr_tamano = int32(size * 1024)
-			mbr.disk_fit = d.F[0]
+			mbr.Mbr_fecha_creacion = time.Now()
+			mbr.Mbr_dsk_signature = int32(int(time.Now().Unix()))
+			mbr.Mbr_tamano = int32(size * 1024)
+			mbr.Disk_fit = d.F[0]
 			for j := 0; j < 4; j++ {
-				mbr.mbr_partition[j].part_start = -1
-				mbr.mbr_partition[j].part_type = 'p'
+				mbr.Mbr_partition[j].Part_start = -1
+				mbr.Mbr_partition[j].Part_type = 'p'
 			}
 			binary.Write(file, binary.LittleEndian, &mbr)
 			d.singleton.AddSalidaConsola(">> COMANDO EJECUTADO CON EXITO SE CREO EL DISCO EXITOSAMENTE\n")

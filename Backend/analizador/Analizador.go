@@ -439,7 +439,7 @@ func (a *Analizador) AnalizarEntrada() {
 					return
 				}
 			}
-			// agregar comando particion.fdisk()
+			a.particion.Fdisk()
 		} else {
 			a.singleton.AddSalidaConsola(">> COMANDO INVALIDO ASEGURESE DE ESCRIBIR BIEN TODO\n")
 		}
