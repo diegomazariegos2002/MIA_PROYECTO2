@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="fdisk version1">
-      <change afterPath="$PROJECT_DIR$/comandos/MountList.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comandos/Nodo_M.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comandos/Rep.go" afterDir="false" />
+    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="reporte disk y estructuras mount">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analizador/Analizador.go" beforeDir="false" afterPath="$PROJECT_DIR$/analizador/Analizador.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/singleton/Singleton.go" beforeDir="false" afterPath="$PROJECT_DIR$/singleton/Singleton.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Rep.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Rep.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +108,8 @@
     <MESSAGE value="primera parte analizador" />
     <MESSAGE value="mkdisk, rmdisk y comienzo fdisk" />
     <MESSAGE value="fdisk version1" />
-    <option name="LAST_COMMIT_MESSAGE" value="fdisk version1" />
+    <MESSAGE value="reporte disk y estructuras mount" />
+    <option name="LAST_COMMIT_MESSAGE" value="reporte disk y estructuras mount" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

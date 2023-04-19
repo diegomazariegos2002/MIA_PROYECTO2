@@ -95,6 +95,9 @@ func (r *Rep) Generate() {
 	}
 }
 
+/*
+*metodo para imprimir reporte disk
+ */
 func (r *Rep) ejecutarReporte_disk() {
 	nodoMontura := r.singleton.MountList.Buscar(r.Id)
 	if nodoMontura == nil {
