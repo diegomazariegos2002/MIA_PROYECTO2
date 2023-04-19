@@ -12,6 +12,7 @@ type Analizador struct {
 	disco     *comandos.Disco
 	singleton *singleton.Singleton
 	particion *comandos.Particion
+	rep       *comandos.Rep
 }
 
 /*
@@ -23,7 +24,8 @@ func NewAnalizador(entrada string) *Analizador {
 		Entrada:   entrada,
 		disco:     comandos.NewDisco(),
 		singleton: singleton.GetInstance(),
-		particion: comandos.NewParticion()}
+		particion: comandos.NewParticion(),
+		rep:       comandos.NewRep()}
 }
 
 // Metodos principales del Analizador
@@ -440,6 +442,127 @@ func (a *Analizador) AnalizarEntrada() {
 				}
 			}
 			a.particion.Fdisk()
+		} else if strings.HasPrefix(entradaMinus, "rep") {
+			entradaMinus = strings.TrimSpace(entradaMinus[3:])
+			a.Entrada = strings.TrimSpace(a.Entrada[3:])
+
+			for len(entradaMinus) > 0 {
+				if strings.HasPrefix(entradaMinus, ">path") {
+					i := strings.Index(entradaMinus, "=") + 1
+					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+
+					if entradaMinus[0] == '"' {
+						entradaMinus = entradaMinus[1:]
+						a.Entrada = a.Entrada[1:]
+						i = strings.Index(entradaMinus, "\"")
+						p := a.Entrada[:i]
+						i += 2
+						a.rep.Path = p
+						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					} else {
+						i := strings.Index(entradaMinus, " ")
+						p := a.Entrada[:i]
+						a.rep.Path = p
+						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					}
+
+				} else if strings.HasPrefix(entradaMinus, ">ruta") {
+					i := strings.Index(entradaMinus, "=") + 1
+					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+
+					if entradaMinus[0] == '"' {
+						entradaMinus = entradaMinus[1:]
+						a.Entrada = a.Entrada[1:]
+						i := strings.Index(entradaMinus, "\"")
+						a.rep.Ruta = a.Entrada[:i]
+						i += 2
+						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					} else {
+						i := strings.Index(entradaMinus, " ")
+						a.rep.Ruta = a.Entrada[:i]
+						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					}
+
+				} else if strings.HasPrefix(entradaMinus, ">name") {
+					i := strings.Index(entradaMinus, "=") + 1
+					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+
+					i = strings.Index(entradaMinus, " ")
+					n := entradaMinus[:i]
+					a.rep.Name = n
+					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+				} else if strings.HasPrefix(entradaMinus, ">id") {
+					i := strings.Index(entradaMinus, "=") + 1
+					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+
+					if entradaMinus[0] == '"' {
+						entradaMinus = entradaMinus[1:]
+						a.Entrada = a.Entrada[1:]
+						i := strings.Index(entradaMinus, "\"")
+						id := a.Entrada[:i]
+						i += 2
+						a.rep.Id = id
+						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					} else {
+						i := strings.Index(entradaMinus, " ")
+						id := a.Entrada[:i]
+						a.rep.Id = id
+						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					}
+
+				} else if strings.HasPrefix(entradaMinus, "#") {
+					// No se opera, ya que entro un comentario
+					break
+				} else {
+					a.singleton.AddSalidaConsola("ERROR EN EL COMANDO: " + entradaMinus)
+					return
+				}
+			}
+			a.rep.Generate()
 		} else {
 			a.singleton.AddSalidaConsola(">> COMANDO INVALIDO ASEGURESE DE ESCRIBIR BIEN TODO\n")
 		}
