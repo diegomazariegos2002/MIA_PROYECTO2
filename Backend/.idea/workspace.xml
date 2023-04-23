@@ -5,8 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="reporte disk y estructuras mount">
+      <change afterPath="$PROJECT_DIR$/comandos/Montar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analizador/Analizador.go" beforeDir="false" afterPath="$PROJECT_DIR$/analizador/Analizador.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Disco.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Disco.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Particion.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Particion.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/comandos/Rep.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Rep.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/Structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Structs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/singleton/Singleton.go" beforeDir="false" afterPath="$PROJECT_DIR$/singleton/Singleton.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +50,7 @@
     &quot;ask.go.tool.to.install.GoGolangCILintTaskConsumer&quot;: &quot;true&quot;,
     &quot;ask.go.tool.to.install.GoImportsTaskConsumer&quot;: &quot;true&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/diego-mazariegos/Escritorio/Proyectos_Oficiales/Go/MIA_PROYECTO2/Backend&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/diego-mazariegos/Escritorio/Proyectos_Oficiales/Go/prueba2&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
@@ -70,6 +77,7 @@
     <configuration name="go watch main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="Backend" />
       <working_directory value="$PROJECT_DIR$" />
+      <sudo value="true" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />

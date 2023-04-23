@@ -5,6 +5,7 @@ import (
 	"miapp/singleton"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -64,15 +65,18 @@ func (d *Disco) Mkdisk() {
 			d.singleton.AddSalidaConsola(">> ERROR EL DISCO YA EXISTE")
 		} else {
 			d.PathFull = d.GetDirectorio(d.P)
-			cmd := exec.Command("sudo", "-S", "mkdir", "-p", d.PathFull)
+			cmd := exec.Command("sudo", "mkdir", "-p", d.PathFull)
 			cmd.Run()
-			cmd = exec.Command("sudo", "-S", "chmod", "-R", "777", d.PathFull)
+
+			cmd = exec.Command("sudo", "chmod", "-R", "777", d.PathFull)
 			cmd.Run()
 
 			var buffer [1024]byte
 			size := d.S
-			if d.U == "m" {
+			if d.U == "k" {
 				size = size * 1024
+			} else if d.U == "m" {
+				size = size * 1024 * 1024
 			}
 			file, _ := os.Create(d.P)
 			defer file.Close()
@@ -83,21 +87,58 @@ func (d *Disco) Mkdisk() {
 			for i := 0; i < size; i += 1024 {
 				file.Write(buffer[:])
 			}
-
+			file.Close()
 			file, _ = os.OpenFile(d.P, os.O_RDWR, 0644)
 			defer file.Close()
 
+			_, err = file.Seek(0, 0)
+
 			var mbr MBR
-			mbr.Mbr_fecha_creacion = time.Now()
-			mbr.Mbr_dsk_signature = int32(int(time.Now().Unix()))
-			mbr.Mbr_tamano = int32(size * 1024)
+			mbr.Mbr_fecha_creacion = time.Now().Unix()
+			mbr.Mbr_dsk_signature = int64(int(time.Now().Unix()))
+			mbr.Mbr_tamano = int64(size * 1024)
 			mbr.Disk_fit = d.F[0]
 			for j := 0; j < 4; j++ {
 				mbr.Mbr_partition[j].Part_start = -1
-				mbr.Mbr_partition[j].Part_type = 'p'
+				mbr.Mbr_partition[j].Part_type = 'P'
 			}
-			binary.Write(file, binary.LittleEndian, &mbr)
+			err = binary.Write(file, binary.LittleEndian, &mbr)
+
 			d.singleton.AddSalidaConsola(">> COMANDO EJECUTADO CON EXITO SE CREO EL DISCO EXITOSAMENTE\n")
+			file.Close()
+			// Abrir el archivo binario en modo lectura
+			f, err := os.OpenFile(d.P, os.O_RDWR, 0644)
+			if err != nil {
+				d.singleton.AddSalidaConsola(err.Error())
+				return
+			}
+			defer f.Close()
+			// Crear un struct MBR vacío para almacenar los datos leídos
+			var m2 MBR
+
+			// Leer el MBR del archivo binario usando encoding/binary
+			err = binary.Read(f, binary.LittleEndian, &m2)
+			if err != nil {
+				d.singleton.AddSalidaConsola(err.Error())
+				return
+			}
+
+			// Imprimir los datos del MBR por la consola usando fmt.Println
+			d.singleton.AddSalidaConsola("Datos del MBR leídos del disco binario:" + "\n")
+			d.singleton.AddSalidaConsola("Mbr_tamano: " + strconv.Itoa(int(m2.Mbr_tamano)) + "\n")
+			d.singleton.AddSalidaConsola("Mbr_fecha_creacion: " + strconv.FormatInt(m2.Mbr_fecha_creacion, 10) + "\n")
+			d.singleton.AddSalidaConsola("Mbr_dsk_signature: " + strconv.Itoa(int(m2.Mbr_dsk_signature)) + "\n")
+			d.singleton.AddSalidaConsola("Disk_fit: " + string(m2.Disk_fit) + "\n")
+			for i, p := range m2.Mbr_partition {
+				d.singleton.AddSalidaConsola("Mbr_partition[%d]: " + strconv.Itoa(i) + "\n")
+				d.singleton.AddSalidaConsola("\tPart_status: " + strconv.Itoa(int(p.Part_status)) + "\n")
+				d.singleton.AddSalidaConsola("\tPart_type: " + strconv.Itoa(int(p.Part_type)) + "\n")
+				d.singleton.AddSalidaConsola("\tPart_fit: " + strconv.Itoa(int(p.Part_fit)) + "\n")
+				d.singleton.AddSalidaConsola("\tPart_start: " + strconv.Itoa(int(p.Part_start)) + "\n")
+				d.singleton.AddSalidaConsola("\tPart_s: " + strconv.Itoa(int(p.Part_s)) + "\n")
+				d.singleton.AddSalidaConsola("\tPart_name: " + string(p.Part_name[:]) + "\n")
+			}
+			file.Close()
 		}
 	}
 }

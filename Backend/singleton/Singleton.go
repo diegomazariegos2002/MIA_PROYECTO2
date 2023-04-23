@@ -1,13 +1,11 @@
 package singleton
 
 import (
-	"miapp/comandos"
 	"sync"
 )
 
 type Singleton struct {
 	salidaConsola string
-	MountList     *comandos.MountList
 }
 
 var instance *Singleton
@@ -20,7 +18,6 @@ func GetInstance() *Singleton {
 	once.Do(func() {
 		instance = &Singleton{
 			salidaConsola: "",
-			MountList:     comandos.NewMountList(),
 		}
 	})
 	return instance

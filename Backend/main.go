@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"miapp/analizador"
+	"miapp/comandos"
 	"miapp/singleton"
 	"net/http"
 	"os"
@@ -24,6 +25,7 @@ type Route struct {
 }
 
 func main() {
+	mountList := comandos.NewMountList()
 	router := gin.Default()
 
 	// Agregar middleware CORS
@@ -34,7 +36,10 @@ func main() {
 	// Definiendo rutas del array routes
 	routes := []Route{
 		{"/", indexHandler, "GET"},
-		{"/compilar", compilar, "POST"},
+		{"/compilar",
+			func(c *gin.Context) {
+				compilar(c, mountList)
+			}, "POST"},
 	}
 
 	// Crea cada ruta del array routes
@@ -84,7 +89,7 @@ func indexHandler(c *gin.Context) {
 	})
 }
 
-func compilar(c *gin.Context) {
+func compilar(c *gin.Context, mountlist *comandos.MountList) {
 	var data map[string]interface{}           // un mapa para guardar los datos del cuerpo
 	if err := c.BindJSON(&data); err != nil { // intentar leer el cuerpo como JSON
 		c.JSON(400, gin.H{"error": err.Error()}) // si hay un error, enviar respuesta 400
@@ -109,9 +114,11 @@ func compilar(c *gin.Context) {
 			line = strings.TrimSpace(line) // eliminar /t/n/_ de los bordes
 
 			// Aquí va la parte del analyzer
-			var analyzer = analizador.NewAnalizador(line + " ") // agrego el " " de ultimo para evitar errores
+			var analyzer = analizador.NewAnalizador(line+" ", comandos.NewMountList()) // agrego el " " de ultimo para evitar errores
 			singleton.AddSalidaConsola("//" + analyzer.Entrada + "\n")
+			analyzer.MountList = mountlist
 			analyzer.AnalizarEntrada()
+			mountlist = analyzer.MountList
 
 			// Verificar si se llegó al final de la entrada
 			if _, err := reader.Peek(1); err != nil {

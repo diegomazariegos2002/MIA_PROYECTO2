@@ -24,7 +24,7 @@ func NewParticion() *Particion {
 		Add:       0,
 		U:         'k',
 		P:         " ",
-		T:         'p',
+		T:         'P',
 		F:         'w',
 		D:         " ",
 		Name:      " ",
@@ -84,6 +84,7 @@ func (p *Particion) primaryPartition() {
 	defer file.Close()
 
 	var mbr MBR
+	file.Seek(0, 0)
 	err = binary.Read(file, binary.LittleEndian, &mbr)
 	if err != nil {
 		p.singleton.AddSalidaConsola("ERROR AL LEER EL MBR\n")
@@ -102,15 +103,15 @@ func (p *Particion) primaryPartition() {
 			copy(newPartitionPrimary.Part_name[:], p.Name)
 			newPartitionPrimary.Part_status = '0'
 			if p.U == 'b' {
-				newPartitionPrimary.Part_s = p.S
+				newPartitionPrimary.Part_s = int64(p.S)
 			} else if p.U == 'k' {
-				newPartitionPrimary.Part_s = p.S * 1024
+				newPartitionPrimary.Part_s = int64(p.S * 1024)
 			} else if p.U == 'm' {
-				newPartitionPrimary.Part_s = p.S * 1024 * 1024
+				newPartitionPrimary.Part_s = int64(p.S * 1024 * 1024)
 			}
 			// buscando donde ubicar en la dirección de memoria el comienzo de la partición
 			if pos == 0 {
-				newPartitionPrimary.Part_start = binary.Size(mbr)
+				newPartitionPrimary.Part_start = int64(binary.Size(mbr))
 			} else {
 				newPartitionPrimary.Part_start = mbr.Mbr_partition[pos-1].Part_start + mbr.Mbr_partition[pos-1].Part_s
 			}
@@ -128,23 +129,15 @@ func (p *Particion) primaryPartition() {
 			}
 
 			var mbrVerificador MBR
-			_, err = file.Seek(0, 0)
-			if err != nil {
-				p.singleton.AddSalidaConsola("ERROR AL MOVERSE AL INICIO DEL ARCHIVO\n")
-				return
-			}
-			err = binary.Read(file, binary.LittleEndian, &mbrVerificador)
-			if err != nil {
-				p.singleton.AddSalidaConsola("ERROR AL LEER EL MBR\n")
-				return
-			}
+			file.Seek(0, 0)
+			binary.Read(file, binary.LittleEndian, &mbrVerificador)
 			file.Close()
 			p.singleton.AddSalidaConsola("OPERACION REALIZADA CON EXITO\n")
 			p.singleton.AddSalidaConsola("PARTICION " + strconv.Itoa(pos+1) + "\n")
 			p.singleton.AddSalidaConsola("NOMBRE: " + string(mbrVerificador.Mbr_partition[pos].Part_name[:]) + "\n")
 			p.singleton.AddSalidaConsola("TIPO: PARTICION PRIMARIA\n")
-			p.singleton.AddSalidaConsola("INICIO: " + strconv.Itoa(mbrVerificador.Mbr_partition[pos].Part_start) + "\n")
-			p.singleton.AddSalidaConsola("SIZE: " + strconv.Itoa(mbrVerificador.Mbr_partition[pos].Part_s) + "\n")
+			p.singleton.AddSalidaConsola("INICIO: " + strconv.Itoa(int(mbrVerificador.Mbr_partition[pos].Part_start)) + "\n")
+			p.singleton.AddSalidaConsola("SIZE: " + strconv.Itoa(int(mbrVerificador.Mbr_partition[pos].Part_s)) + "\n")
 		} else {
 			p.singleton.AddSalidaConsola("YA HAY UNA PARTICION CON ESE NOMBRE " + p.Name + "\n")
 		}
@@ -162,7 +155,8 @@ func (p *Particion) extendPartition() {
 		return
 	}
 	defer file.Close()
-	mbr := MBR{}
+	var mbr MBR
+	_, err = file.Seek(0, 0)
 	err = binary.Read(file, binary.LittleEndian, &mbr)
 	if err != nil {
 		p.singleton.AddSalidaConsola("ERROR LEYENDO EL MBR\n")
@@ -183,20 +177,20 @@ func (p *Particion) extendPartition() {
 				copy(newPartitionExtend.Part_name[:], p.Name)
 				newPartitionExtend.Part_status = '0'
 				if p.U == 'b' {
-					newPartitionExtend.Part_s = p.S
+					newPartitionExtend.Part_s = int64(p.S)
 				} else if p.U == 'k' {
-					newPartitionExtend.Part_s = p.S * 1024
+					newPartitionExtend.Part_s = int64(p.S * 1024)
 				} else if p.U == 'm' {
-					newPartitionExtend.Part_s = p.S * 1024 * 1024
+					newPartitionExtend.Part_s = int64(p.S * 1024 * 1024)
 				}
 
 				if indice == 0 {
-					newPartitionExtend.Part_start = binary.Size(mbr)
+					newPartitionExtend.Part_start = int64(binary.Size(mbr))
 				} else {
 					newPartitionExtend.Part_start = mbr.Mbr_partition[indice-1].Part_start + mbr.Mbr_partition[indice-1].Part_s
 				}
 
-				addressEBR = newPartitionExtend.Part_start
+				addressEBR = int(newPartitionExtend.Part_start)
 				mbr.Mbr_partition[indice] = newPartitionExtend
 
 				_, err = file.Seek(0, 0)
@@ -213,7 +207,7 @@ func (p *Particion) extendPartition() {
 
 				ebr := EBR{
 					Part_next:   -1,
-					Part_start:  addressEBR,
+					Part_start:  int64(addressEBR),
 					Part_s:      -1,
 					Part_status: '0',
 				}
@@ -234,8 +228,8 @@ func (p *Particion) extendPartition() {
 				p.singleton.AddSalidaConsola("PARTICION " + strconv.Itoa(indice+1) + "\n")
 				p.singleton.AddSalidaConsola("NOMBRE: " + string(mbr.Mbr_partition[indice].Part_name[:]) + "\n")
 				p.singleton.AddSalidaConsola("TIPO: PARTICION EXTENDIDA\n")
-				p.singleton.AddSalidaConsola("INICIO: " + strconv.Itoa(mbr.Mbr_partition[indice].Part_start) + "\n")
-				p.singleton.AddSalidaConsola("SIZE: " + strconv.Itoa(mbr.Mbr_partition[indice].Part_s) + "\n")
+				p.singleton.AddSalidaConsola("INICIO: " + strconv.Itoa(int(mbr.Mbr_partition[indice].Part_start)) + "\n")
+				p.singleton.AddSalidaConsola("SIZE: " + strconv.Itoa(int(mbr.Mbr_partition[indice].Part_s)) + "\n")
 			} else {
 				p.singleton.AddSalidaConsola("YA EXISTE UNA PARTICION EXTENDIDA CON ESE NOMBRE\n")
 			}
@@ -274,7 +268,7 @@ func (p *Particion) LogicPartition() {
 			if indice != -1 {
 				var ebrAuxiliar EBR
 				var fullSpace int = 0
-				var filePos int = mbr.Mbr_partition[indice].Part_start // se agrega inicialización
+				var filePos int = int(mbr.Mbr_partition[indice].Part_start) // se agrega inicialización
 
 				if _, err := file.Seek(int64(mbr.Mbr_partition[indice].Part_start), io.SeekStart); err != nil {
 					p.singleton.AddSalidaConsola("NO SE PUDO MOVER EL PUNTERO EN EL ARCHIVO\n")
@@ -287,8 +281,8 @@ func (p *Particion) LogicPartition() {
 				}
 
 				if ebrAuxiliar.Part_next != -1 || ebrAuxiliar.Part_s != -1 {
-					fullSpace += (int)(unsafe.Sizeof(EBR{})) + ebrAuxiliar.Part_s
-					for ebrAuxiliar.Part_next != -1 && filePos < (mbr.Mbr_partition[indice].Part_start+mbr.Mbr_partition[indice].Part_s) {
+					fullSpace += (int)(unsafe.Sizeof(EBR{})) + (int)(ebrAuxiliar.Part_s)
+					for ebrAuxiliar.Part_next != -1 && filePos < (int)(mbr.Mbr_partition[indice].Part_start+mbr.Mbr_partition[indice].Part_s) {
 
 						if _, err := file.Seek(int64(ebrAuxiliar.Part_next), io.SeekStart); err != nil {
 							p.singleton.AddSalidaConsola("NO SE PUDO MOVER EL PUNTERO EN EL ARCHIVO\n")
@@ -300,26 +294,26 @@ func (p *Particion) LogicPartition() {
 							return
 						}
 
-						fullSpace += (int)(unsafe.Sizeof(EBR{})) + ebrAuxiliar.Part_s
+						fullSpace += (int)(unsafe.Sizeof(EBR{})) + (int)(ebrAuxiliar.Part_s)
 					}
 
 					var newExtend EBR
 					newExtend.Part_fit = p.F
-					newExtend.Part_start = ebrAuxiliar.Part_start + (int)(unsafe.Sizeof(EBR{})) + ebrAuxiliar.Part_s
+					newExtend.Part_start = int64(((int)(ebrAuxiliar.Part_start)) + (int)(unsafe.Sizeof(EBR{})) + ((int)(ebrAuxiliar.Part_s)))
 					newExtend.Part_status = '0'
 					newExtend.Part_next = -1
 					copy(newExtend.Part_name[:], p.Name)
 
 					if p.U == 'b' {
-						newExtend.Part_s = p.S
+						newExtend.Part_s = int64(p.S)
 					} else if p.U == 'k' {
-						newExtend.Part_s = p.S * 1024
+						newExtend.Part_s = int64(p.S * 1024)
 					} else if p.U == 'm' {
-						newExtend.Part_s = p.S * 1024 * 1024
+						newExtend.Part_s = int64(p.S * 1024 * 1024)
 					}
 
-					freeSpace := mbr.Mbr_partition[indice].Part_s - fullSpace
-					espacioNewE := (int)(unsafe.Sizeof(EBR{})) + newExtend.Part_s
+					freeSpace := (int)(mbr.Mbr_partition[indice].Part_s) - fullSpace
+					espacioNewE := (int)(unsafe.Sizeof(EBR{})) + (int)(newExtend.Part_s)
 					ebrAuxiliar.Part_next = newExtend.Part_start
 					if freeSpace >= espacioNewE {
 						ebrAuxiliar.Part_next = newExtend.Part_start
@@ -334,8 +328,8 @@ func (p *Particion) LogicPartition() {
 						p.singleton.AddSalidaConsola("OPERACION REALIZADA CON EXITO\n")
 						p.singleton.AddSalidaConsola("Nombre particion: " + string(newExtend.Part_name[:]) + "\n")
 						p.singleton.AddSalidaConsola("Tipo: Logica\n")
-						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(newExtend.Part_start) + "\n")
-						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(newExtend.Part_s) + "\n")
+						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(int(newExtend.Part_start)) + "\n")
+						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(int(newExtend.Part_s)) + "\n")
 					} else {
 						p.singleton.AddSalidaConsola("NO EXISTE EL ESPACIO NECESARIO PARA EJECUTAR ESTE COMANDO\n")
 						file.Close()
@@ -345,18 +339,18 @@ func (p *Particion) LogicPartition() {
 					ebrAuxiliar.Part_start = mbr.Mbr_partition[indice].Part_start
 					ebrAuxiliar.Part_status = '0'
 					if p.U == 'b' {
-						ebrAuxiliar.Part_s = p.S
+						ebrAuxiliar.Part_s = int64(p.S)
 					} else if p.U == 'k' {
-						ebrAuxiliar.Part_s = p.S * 1024
+						ebrAuxiliar.Part_s = int64(p.S * 1024)
 					} else if p.U == 'm' {
-						ebrAuxiliar.Part_s = p.S * 1024 * 1024
+						ebrAuxiliar.Part_s = int64(p.S * 1024 * 1024)
 					}
 					ebrAuxiliar.Part_next = -1
 					copy(ebrAuxiliar.Part_name[:], []byte(p.Name))
 
-					if mbr.Mbr_partition[indice].Part_s >= (ebrAuxiliar.Part_s + (binary.Size(EBR{}))) {
+					if int(mbr.Mbr_partition[indice].Part_s) >= (int(ebrAuxiliar.Part_s) + (binary.Size(EBR{}))) {
 						file.Seek(0, io.SeekStart)
-						binary.Write(file, binary.LittleEndian, mbr)
+						binary.Write(file, binary.LittleEndian, &mbr)
 
 						file.Seek(int64(mbr.Mbr_partition[indice].Part_start), io.SeekStart)
 						binary.Write(file, binary.LittleEndian, ebrAuxiliar)
@@ -364,8 +358,8 @@ func (p *Particion) LogicPartition() {
 						p.singleton.AddSalidaConsola("OPERACION REALIZADA CON EXITO\n")
 						p.singleton.AddSalidaConsola("Nombre particion: " + string(ebrAuxiliar.Part_name[:]) + "\n")
 						p.singleton.AddSalidaConsola("Tipo: Logica\n")
-						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(ebrAuxiliar.Part_start) + "\n")
-						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(ebrAuxiliar.Part_s) + "\n")
+						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(int(ebrAuxiliar.Part_start)) + "\n")
+						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(int(ebrAuxiliar.Part_s)) + "\n")
 					} else {
 						file.Close()
 						p.singleton.AddSalidaConsola("NO EXISTE EL ESPACIO SUFICIENTE PARA EJECUTAR ESTE COMANDO\n")
@@ -473,7 +467,8 @@ func (p *Particion) freeSpace(s int, path string, u byte, address int) bool {
 	}
 	defer file.Close()
 
-	mbr := MBR{}
+	var mbr MBR
+	_, err = file.Seek(0, 0)
 	err = binary.Read(file, binary.LittleEndian, &mbr)
 	if err != nil {
 		return false
@@ -492,7 +487,7 @@ func (p *Particion) freeSpace(s int, path string, u byte, address int) bool {
 		if size > 0 {
 			freeSpace := 0
 			if address == 0 { // si es la primera particion
-				freeSpace = int(mbr.Mbr_tamano) - int(binary.Size(mbr))
+				freeSpace = int(mbr.Mbr_tamano) - binary.Size(mbr)
 			} else { // si no es la primera particion
 				freeSpace = int(mbr.Mbr_tamano) - int(mbr.Mbr_partition[address-1].Part_start) - int(mbr.Mbr_partition[address-1].Part_s)
 			}
@@ -510,7 +505,8 @@ func (p *Particion) existeParticionExtendida(path string) bool {
 		p.singleton.AddSalidaConsola("ERROR AL ABRIR EL ARCHIVO: " + err.Error())
 		return false
 	}
-	mbr := MBR{}
+	var mbr MBR
+	_, err = file.Seek(0, 0)
 	err = binary.Read(file, binary.LittleEndian, &mbr)
 	if err != nil {
 		p.singleton.AddSalidaConsola("ERROR AL LEER EL MBR: " + err.Error())
@@ -526,12 +522,14 @@ func (p *Particion) existeParticionExtendida(path string) bool {
 
 func (p *Particion) existeParticion(path string, name string) bool {
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
+	file.Seek(0, 0)
 	if err != nil {
 		p.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error())
 	}
 	defer file.Close()
 
 	var mbr MBR
+	file.Seek(0, 0)
 	if err := binary.Read(file, binary.LittleEndian, &mbr); err != nil {
 		p.singleton.AddSalidaConsola("ERROR AL LEER EL MBR: " + err.Error())
 	}

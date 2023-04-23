@@ -13,19 +13,23 @@ type Analizador struct {
 	singleton *singleton.Singleton
 	particion *comandos.Particion
 	rep       *comandos.Rep
+	MountList *comandos.MountList
+	Montar    *comandos.Montar
 }
 
 /*
 *Constructor
  */
-func NewAnalizador(entrada string) *Analizador {
+func NewAnalizador(entrada string, mountList *comandos.MountList) *Analizador {
 	entrada = removeSpace(entrada)
 	return &Analizador{
 		Entrada:   entrada,
 		disco:     comandos.NewDisco(),
 		singleton: singleton.GetInstance(),
 		particion: comandos.NewParticion(),
-		rep:       comandos.NewRep()}
+		MountList: mountList,
+		rep:       comandos.NewRep(),
+		Montar:    comandos.NewMontar()}
 }
 
 // Metodos principales del Analizador
@@ -562,7 +566,88 @@ func (a *Analizador) AnalizarEntrada() {
 					return
 				}
 			}
+			a.rep.MountList = a.MountList
 			a.rep.Generate()
+			a.MountList = a.rep.MountList
+		} else if strings.HasPrefix(entradaMinus, "mount") {
+			i := 5
+			for i < len(entradaMinus) && i < len(entradaMinus) && entradaMinus[i] == ' ' {
+				i++
+			}
+			entradaMinus = entradaMinus[i:]
+			a.Entrada = a.Entrada[i:]
+
+			for len(entradaMinus) > 0 {
+				if strings.HasPrefix(entradaMinus, ">path") {
+					i = strings.Index(entradaMinus, "=") + 1
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+
+					if entradaMinus[0] == '"' {
+						entradaMinus = entradaMinus[1:]
+						a.Entrada = a.Entrada[1:]
+						i = strings.Index(entradaMinus, "\"")
+						p := a.Entrada[:i]
+						i += 2
+						a.Montar.P = p
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					} else {
+						i = strings.IndexByte(entradaMinus, ' ')
+						p := a.Entrada[:i]
+						a.Montar.P = p
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					}
+				} else if strings.HasPrefix(entradaMinus, ">name") {
+					i = strings.Index(entradaMinus, "=") + 1
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' {
+						i++
+					}
+					entradaMinus = entradaMinus[i:]
+					a.Entrada = a.Entrada[i:]
+
+					if entradaMinus[0] == '"' {
+						entradaMinus = entradaMinus[1:]
+						a.Entrada = a.Entrada[1:]
+						i = strings.Index(entradaMinus, "\"")
+						n := a.Entrada[:i]
+						i += 2
+						a.Montar.Name = n
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					} else {
+						i = strings.IndexByte(entradaMinus, ' ')
+						n := a.Entrada[:i]
+						a.Montar.Name = n
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' {
+							i++
+						}
+						entradaMinus = entradaMinus[i:]
+						a.Entrada = a.Entrada[i:]
+					}
+				} else if strings.HasPrefix(entradaMinus, "#") {
+					break
+				} else {
+					a.singleton.AddSalidaConsola("ERROR EN: " + entradaMinus + "\n")
+					return
+				}
+			}
+			a.Montar.MountList = a.MountList
+			a.Montar.Mount()
+			a.MountList = a.Montar.MountList
 		} else {
 			a.singleton.AddSalidaConsola(">> COMANDO INVALIDO ASEGURESE DE ESCRIBIR BIEN TODO\n")
 		}

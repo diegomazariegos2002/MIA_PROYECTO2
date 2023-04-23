@@ -23,6 +23,7 @@ type Rep struct {
 	SuperBloqueGlobal              SuperBloque
 	ContadorBloques_ReporteBloques int
 	singleton                      *singleton.Singleton
+	MountList                      *MountList
 }
 
 func NewRep() *Rep {
@@ -36,6 +37,7 @@ func NewRep() *Rep {
 		SuperBloqueGlobal:              SuperBloque{},
 		ContadorBloques_ReporteBloques: 0,
 		singleton:                      singleton.GetInstance(),
+		MountList:                      NewMountList(),
 	}
 }
 func (r *Rep) GetCarpetas(ruta string) string {
@@ -99,7 +101,7 @@ func (r *Rep) Generate() {
 *metodo para imprimir reporte disk
  */
 func (r *Rep) ejecutarReporte_disk() {
-	nodoMontura := r.singleton.MountList.Buscar(r.Id)
+	nodoMontura := r.MountList.Buscar(r.Id)
 	if nodoMontura == nil {
 		r.singleton.AddSalidaConsola("No se encontró el ID de montaje especificado")
 		return
@@ -144,14 +146,14 @@ func (r *Rep) ejecutarReporte_disk() {
 			i++
 			for i < 4 {
 				if mbr.Mbr_partition[i].Part_start != -1 {
-					porcentaje := ((mbr.Mbr_partition[i].Part_start - int(start)) / (size * 1.0)) * 100.0
+					porcentaje := ((int(mbr.Mbr_partition[i].Part_start) - int(start)) / (size * 1.0)) * 100.0
 					fmt.Fprintln(fileDot, fmt.Sprintf("<td bgcolor=\"lavender\" rowspan=\"2\">LIBRE <br/>%.0f</td>\n", math.Round(float64(porcentaje))))
 					break
 				}
 				i++
 			}
 			if i == 4 {
-				porcentaje := float64(size-mbr.Mbr_partition[i-1].Part_start-mbr.Mbr_partition[i-1].Part_s) / float64(size) * 100.0
+				porcentaje := float64(size-int(mbr.Mbr_partition[i-1].Part_start-mbr.Mbr_partition[i-1].Part_s)) / float64(size) * 100.0
 				r.singleton.AddSalidaConsola(fmt.Sprintf("<td bgcolor=\"lavender\" rowspan=\"2\">LIBRE <br/>%.0f</td>\n", math.Round(porcentaje)))
 				goto salida1
 			}
@@ -205,7 +207,7 @@ func (r *Rep) ejecutarReporte_disk() {
 					}
 				}
 				fmt.Fprintln(fileDot, "<td bgcolor=\"darkolivegreen1\" colspan=\""+string(contadorBloquesExtendida)+"\">EXTENDIDA</td>")
-			} else if mbr.Mbr_partition[i].Part_type == 'p' {
+			} else if mbr.Mbr_partition[i].Part_type == 'P' {
 				p1 := float32(mbr.Mbr_partition[i].Part_s) / float32(size)
 				porcentaje := p1 * 100.0
 				name1 := mbr.Mbr_partition[i].Part_name
@@ -215,8 +217,8 @@ func (r *Rep) ejecutarReporte_disk() {
 						porcentaje = (float32(mbr.Mbr_partition[i+1].Part_start-(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s)) / float32(size)) * 100
 						fmt.Fprintf(fileDot, "<td bgcolor=lavender rowspan=2>LIBRE <br/>%d</td>", int(math.Round(float64(porcentaje))))
 					}
-				} else if mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s < size {
-					porcentaje = (float32(size-(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s)) / float32(size)) * 100
+				} else if int(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s) < size {
+					porcentaje = (float32(size-(int(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s))) / float32(size)) * 100
 					fmt.Fprintf(fileDot, "<td bgcolor=lavender rowspan=2>LIBRE <br/>%d</td>", int(math.Round(float64(porcentaje))))
 				}
 			}

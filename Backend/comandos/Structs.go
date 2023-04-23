@@ -1,89 +1,87 @@
 package comandos
 
-import "time"
-
 type Partition struct {
-	Part_status byte
-	Part_type   byte
-	Part_fit    byte
-	Part_start  int
-	Part_s      int
-	Part_name   [16]byte
+	Part_status uint8     // Cambiar char a uint8
+	Part_type   uint8     // Cambiar char a uint8
+	Part_fit    uint8     // Cambiar char a uint8
+	Part_start  int64     // Cambiar int a int64
+	Part_s      int64     // Cambiar int a int64
+	Part_name   [16]uint8 // Cambiar char a uint8
 }
 
 type MBR struct {
-	Mbr_tamano         int32
-	Mbr_fecha_creacion time.Time // recordar que al convertir el tiempo ejemplo: fechaFormateada := mbr.mbr_fecha_creacion.Format("2006-01-02 15:04:05")
-	Mbr_dsk_signature  int32
-	Disk_fit           byte
+	Mbr_tamano         int64 // Cambiar int a int64
+	Mbr_fecha_creacion int64 // Cambiar time_t a int64
+	Mbr_dsk_signature  int64 // Cambiar int a int64
+	Disk_fit           uint8 // Cambiar char a uint8
 	Mbr_partition      [4]Partition
 }
 
 type EBR struct {
-	Part_status byte
-	Part_fit    byte
-	Part_start  int
-	Part_s      int
-	Part_next   int
-	Part_name   [16]byte
+	Part_status uint8     // Cambiar char a uint8
+	Part_fit    uint8     // Cambiar char a uint8
+	Part_start  int64     // Cambiar int a int64
+	Part_s      int64     // Cambiar int a int64
+	Part_next   int64     // Cambiar int a int64
+	Part_name   [16]uint8 // Cambiar char a uint8
 }
 
 type SuperBloque struct {
-	s_filesystem_type   int32
-	s_inodes_count      int32
-	s_blocks_count      int32
-	s_free_blocks_count int32
-	s_free_inodes_count int32
-	s_mtime             time.Time
-	s_umtime            time.Time
-	s_mnt_count         int32
-	s_magic             int32
-	s_inode_s           int32
-	s_block_s           int32
-	s_firts_ino         int32
-	s_first_blo         int32
-	s_bm_inode_start    int32
-	s_bm_block_start    int32
-	s_inode_start       int32
-	s_block_start       int32
+	S_filesystem_type   int64 // Cambiar int a int64
+	S_inodes_count      int64 // Cambiar int a int64
+	S_blocks_count      int64 // Cambiar int a int64
+	S_free_blocks_count int64 // Cambiar int a int64
+	S_free_inodes_count int64 // Cambiar int a int64
+	S_mtime             int64 // Cambiar time_t a int64
+	S_umtime            int64 // Cambiar time_t a int64
+	S_mnt_count         int64 // Cambiar int a int64
+	S_magic             int64 // Cambiar int a int64
+	S_inode_s           int64 // Cambiar int a int64
+	S_block_s           int64 // Cambiar int a int64
+	S_firts_ino         int64 // Cambiar int a int64
+	S_first_blo         int64 // Cambiar int a int64
+	S_bm_inode_start    int64 // Cambiar int a int64
+	S_bm_block_start    int64 // Cambiar int a int64
+	S_inode_start       int64 // Cambiar int a int64
+	S_block_start       int64 // Cambiar int a int64
 }
 
 type TablaInodo struct {
-	i_uid   int32
-	i_gid   int32
-	i_size  int32
-	i_atime time.Time
-	i_ctime time.Time
-	i_mtime time.Time
-	i_block [15]int32
-	i_type  byte
-	i_perm  int32
+	I_uid   int64     // Cambiar int a int64
+	I_gid   int64     // Cambiar int a int64
+	I_s     int64     // Cambiar int a int64
+	I_atime int64     // Cambiar time_t a int64
+	I_ctime int64     // Cambiar time_t a int64
+	I_mtime int64     // Cambiar time_t a int64
+	I_block [15]int64 // Cambiar int a int64
+	I_type  uint8     // Cambiar char a uint8
+	I_perm  int64     // Cambiar int a int64
 }
 
-type content struct {
-	b_name  [12]byte
-	b_inodo int32
+type Content struct {
+	B_name  [12]uint8 // Cambiar char a uint8
+	B_inodo int64     // Cambiar int a int64
 }
 
 type BloqueCarpeta struct {
-	b_content [4]content
+	B_content [4]Content
 }
 
 type BloqueArchivo struct {
-	b_content [64]byte
+	B_content [64]uint8 // Cambiar char a uint8
 }
 
 type BloqueApuntador struct {
-	b_pointers [16]int32
+	B_pointers [16]int64 // Cambiar int a int64
 }
 
 type Journal struct {
-	journal_Tipo_Operacion [10]byte
-	journal_Tipo           byte
-	journal_Path           [100]byte
-	journal_Contenido      [100]byte
-	journal_Fecha          time.Time
-	journal_Size           int32
-	journal_Sig            int32
-	journal_Start          int32
+	Journal_Tipo_Operacion [10]uint8  // Cambiar char a uint8
+	Journal_Tipo           uint8      // Cambiar char a uint8
+	Journal_Path           [100]uint8 // Cambiar char a uint8
+	Journal_Contenido      [100]uint8 // Cambiar char a uint8
+	Journal_Fecha          int64      // Cambiar time_t a int64
+	Journal_Size           int64      // Cambiar int a int64
+	Journal_Sig            int64      // Cambiar int a int64
+	Journal_Start          int64      // Cambiar int a int64
 }
