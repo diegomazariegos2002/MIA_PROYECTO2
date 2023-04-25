@@ -317,19 +317,30 @@ func (p *Particion) LogicPartition() {
 					ebrAuxiliar.Part_next = newExtend.Part_start
 					if freeSpace >= espacioNewE {
 						ebrAuxiliar.Part_next = newExtend.Part_start
+						file.Seek(ebrAuxiliar.Part_start, 0)
 						if err := binary.Write(file, binary.LittleEndian, &ebrAuxiliar); err != nil {
 							log.Fatal(err)
 						}
-
+						file.Seek(newExtend.Part_start, 0)
 						if err := binary.Write(file, binary.LittleEndian, &newExtend); err != nil {
 							log.Fatal(err)
 						}
+						file.Close()
 
+						file, err = os.OpenFile(p.P, os.O_RDWR, 0644)
+						var ebrAux EBR
+						var ebrNew EBR
+						file.Seek(ebrAuxiliar.Part_start, 0)
+						binary.Read(file, binary.LittleEndian, &ebrAux)
+						file.Seek(ebrAuxiliar.Part_next, 0)
+						binary.Read(file, binary.LittleEndian, &ebrNew)
+						file.Close()
 						p.singleton.AddSalidaConsola("OPERACION REALIZADA CON EXITO\n")
-						p.singleton.AddSalidaConsola("Nombre particion: " + string(newExtend.Part_name[:]) + "\n")
+						p.singleton.AddSalidaConsola("Nombre particion: " + string(ebrNew.Part_name[:]) + "\n")
 						p.singleton.AddSalidaConsola("Tipo: Logica\n")
-						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(int(newExtend.Part_start)) + "\n")
-						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(int(newExtend.Part_s)) + "\n")
+						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(int(ebrNew.Part_start)) + "\n")
+						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(int(ebrNew.Part_s)) + "\n")
+						p.singleton.AddSalidaConsola("EBR Anterior next: " + strconv.Itoa(int(ebrAux.Part_next)) + "\n")
 					} else {
 						p.singleton.AddSalidaConsola("NO EXISTE EL ESPACIO NECESARIO PARA EJECUTAR ESTE COMANDO\n")
 						file.Close()
@@ -346,7 +357,7 @@ func (p *Particion) LogicPartition() {
 						ebrAuxiliar.Part_s = int64(p.S * 1024 * 1024)
 					}
 					ebrAuxiliar.Part_next = -1
-					copy(ebrAuxiliar.Part_name[:], []byte(p.Name))
+					copy(ebrAuxiliar.Part_name[:], p.Name)
 
 					if int(mbr.Mbr_partition[indice].Part_s) >= (int(ebrAuxiliar.Part_s) + (binary.Size(EBR{}))) {
 						file.Seek(0, io.SeekStart)
@@ -355,11 +366,18 @@ func (p *Particion) LogicPartition() {
 						file.Seek(int64(mbr.Mbr_partition[indice].Part_start), io.SeekStart)
 						binary.Write(file, binary.LittleEndian, ebrAuxiliar)
 						file.Close()
+
+						file, err = os.OpenFile(p.P, os.O_RDWR, 0644)
+						var ebr2 EBR
+						file.Seek(mbr.Mbr_partition[indice].Part_start, 0)
+						binary.Read(file, binary.LittleEndian, &ebr2)
+
 						p.singleton.AddSalidaConsola("OPERACION REALIZADA CON EXITO\n")
-						p.singleton.AddSalidaConsola("Nombre particion: " + string(ebrAuxiliar.Part_name[:]) + "\n")
+						p.singleton.AddSalidaConsola("Nombre particion: " + string(ebr2.Part_name[:]) + "\n")
 						p.singleton.AddSalidaConsola("Tipo: Logica\n")
-						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(int(ebrAuxiliar.Part_start)) + "\n")
-						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(int(ebrAuxiliar.Part_s)) + "\n")
+						p.singleton.AddSalidaConsola("Inicio: " + strconv.Itoa(int(ebr2.Part_start)) + "\n")
+						p.singleton.AddSalidaConsola("Size: " + strconv.Itoa(int(ebr2.Part_s)) + "\n")
+						p.singleton.AddSalidaConsola("Part_next: " + strconv.Itoa(int(ebr2.Part_next)) + "\n")
 					} else {
 						file.Close()
 						p.singleton.AddSalidaConsola("NO EXISTE EL ESPACIO SUFICIENTE PARA EJECUTAR ESTE COMANDO\n")

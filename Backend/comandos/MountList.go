@@ -104,15 +104,7 @@ func (m *MountList) Add(path string, name string, t byte, start int, pos int) {
 	if !m.ExistMount(path, name) {
 		num := m.GetNum(path)
 		letra := m.GetName(path)
-		nuevo := &NodoM{
-			Path:  path,
-			Name:  name,
-			Type:  t,
-			Num:   num,
-			Letra: letra,
-			Start: start,
-			Pos:   pos,
-		}
+		nuevo := NewNodoM(path, name, t, num, letra, start, pos)
 		if m.primero == nil {
 			m.primero = nuevo
 			m.ultimo = nuevo

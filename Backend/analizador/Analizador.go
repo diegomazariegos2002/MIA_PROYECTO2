@@ -447,13 +447,17 @@ func (a *Analizador) AnalizarEntrada() {
 			}
 			a.particion.Fdisk()
 		} else if strings.HasPrefix(entradaMinus, "rep") {
-			entradaMinus = strings.TrimSpace(entradaMinus[3:])
-			a.Entrada = strings.TrimSpace(a.Entrada[3:])
+			i := 3
+			for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+				i++
+			}
+			entradaMinus = entradaMinus[i:]
+			a.Entrada = a.Entrada[i:]
 
 			for len(entradaMinus) > 0 {
 				if strings.HasPrefix(entradaMinus, ">path") {
 					i := strings.Index(entradaMinus, "=") + 1
-					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 						i++
 					}
 					entradaMinus = entradaMinus[i:]
@@ -466,7 +470,7 @@ func (a *Analizador) AnalizarEntrada() {
 						p := a.Entrada[:i]
 						i += 2
 						a.rep.Path = p
-						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 							i++
 						}
 						entradaMinus = entradaMinus[i:]
@@ -475,7 +479,7 @@ func (a *Analizador) AnalizarEntrada() {
 						i := strings.Index(entradaMinus, " ")
 						p := a.Entrada[:i]
 						a.rep.Path = p
-						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 							i++
 						}
 						entradaMinus = entradaMinus[i:]
@@ -484,7 +488,7 @@ func (a *Analizador) AnalizarEntrada() {
 
 				} else if strings.HasPrefix(entradaMinus, ">ruta") {
 					i := strings.Index(entradaMinus, "=") + 1
-					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 						i++
 					}
 					entradaMinus = entradaMinus[i:]
@@ -496,7 +500,7 @@ func (a *Analizador) AnalizarEntrada() {
 						i := strings.Index(entradaMinus, "\"")
 						a.rep.Ruta = a.Entrada[:i]
 						i += 2
-						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 							i++
 						}
 						entradaMinus = entradaMinus[i:]
@@ -504,7 +508,7 @@ func (a *Analizador) AnalizarEntrada() {
 					} else {
 						i := strings.Index(entradaMinus, " ")
 						a.rep.Ruta = a.Entrada[:i]
-						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 							i++
 						}
 						entradaMinus = entradaMinus[i:]
@@ -513,7 +517,7 @@ func (a *Analizador) AnalizarEntrada() {
 
 				} else if strings.HasPrefix(entradaMinus, ">name") {
 					i := strings.Index(entradaMinus, "=") + 1
-					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 						i++
 					}
 					entradaMinus = entradaMinus[i:]
@@ -522,14 +526,14 @@ func (a *Analizador) AnalizarEntrada() {
 					i = strings.Index(entradaMinus, " ")
 					n := entradaMinus[:i]
 					a.rep.Name = n
-					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 						i++
 					}
 					entradaMinus = entradaMinus[i:]
 					a.Entrada = a.Entrada[i:]
 				} else if strings.HasPrefix(entradaMinus, ">id") {
 					i := strings.Index(entradaMinus, "=") + 1
-					for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+					for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 						i++
 					}
 					entradaMinus = entradaMinus[i:]
@@ -542,7 +546,7 @@ func (a *Analizador) AnalizarEntrada() {
 						id := a.Entrada[:i]
 						i += 2
 						a.rep.Id = id
-						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 							i++
 						}
 						entradaMinus = entradaMinus[i:]
@@ -551,7 +555,7 @@ func (a *Analizador) AnalizarEntrada() {
 						i := strings.Index(entradaMinus, " ")
 						id := a.Entrada[:i]
 						a.rep.Id = id
-						for entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
+						for i < len(entradaMinus) && entradaMinus[i] == ' ' && len(entradaMinus) > 0 {
 							i++
 						}
 						entradaMinus = entradaMinus[i:]

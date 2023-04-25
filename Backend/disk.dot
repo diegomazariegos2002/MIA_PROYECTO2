@@ -1,0 +1,20 @@
+digraph G {
+node[shape=none]
+start[label=<<table CELLSPACING="0"><tr>
+<td bgcolor="khaki1" rowspan="2">MBR</td>
+<td bgcolor="darkolivegreen1" colspan="5">EXTENDIDA</td>
+<td bgcolor="violet" rowspan="2">Part2 <br/>25</td>
+<td bgcolor="violet" rowspan="2">Part3 <br/>25</td>
+<td bgcolor="violet" rowspan="2">Part4 <br/>25</td>
+<td bgcolor="lavender" rowspan="2">LIBRE <br/>1</td>
+</tr>
+<tr>
+<td bgcolor="steelblue1" rowspan="1">EBR <br/> Part5 </td>
+<td bgcolor="tan1" rowspan="1">Logica <br/> 1 </td>
+<td bgcolor="steelblue1" rowspan="1">EBR <br/>Part6</td>
+<td bgcolor="tan1" rowspan="1">Logica <br/>1</td>
+<td bgcolor="lavender" rowspan="1">Libre <br/>23</td>
+</tr>
+
+</table>>];
+}

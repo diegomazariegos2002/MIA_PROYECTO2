@@ -96,7 +96,7 @@ func (d *Disco) Mkdisk() {
 			var mbr MBR
 			mbr.Mbr_fecha_creacion = time.Now().Unix()
 			mbr.Mbr_dsk_signature = int64(int(time.Now().Unix()))
-			mbr.Mbr_tamano = int64(size * 1024)
+			mbr.Mbr_tamano = int64(size)
 			mbr.Disk_fit = d.F[0]
 			for j := 0; j < 4; j++ {
 				mbr.Mbr_partition[j].Part_start = -1

@@ -1,15 +1,15 @@
 package comandos
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
-	"log"
 	"math"
 	"miapp/singleton"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -59,7 +59,7 @@ func (r *Rep) Generate() {
 			case "mbr":
 				//r.ejecutarReporte_mbr()
 			case "disk":
-				//r.ejecutarReporte_disk()
+				r.ejecutarReporte_disk()
 			case "inode":
 				//r.ejecutarReporte_inode()
 			case "block":
@@ -110,8 +110,12 @@ func (r *Rep) ejecutarReporte_disk() {
 	var mbr MBR
 	r.Extension = r.GetExtensionFile(r.Path)
 	r.Directorio = r.GetCarpetas(r.Path)
-	os.MkdirAll(r.Directorio, 0777)
-	os.Chmod(r.Directorio, 0777)
+	err := os.MkdirAll(r.Directorio, 0777) // Crea el directorio
+	if err != nil {                        // Comprueba si hay un error
+		fmt.Println(err) // Imprime el error
+		return           // Sale de la función
+	}
+	os.Chmod(r.Directorio, 0777) // Cambia los permisos del directorio
 
 	fileReporte, err := os.OpenFile(nodoMontura.Path, os.O_RDWR, 0777)
 	if err != nil {
@@ -153,8 +157,8 @@ func (r *Rep) ejecutarReporte_disk() {
 				i++
 			}
 			if i == 4 {
-				porcentaje := float64(size-int(mbr.Mbr_partition[i-1].Part_start-mbr.Mbr_partition[i-1].Part_s)) / float64(size) * 100.0
-				r.singleton.AddSalidaConsola(fmt.Sprintf("<td bgcolor=\"lavender\" rowspan=\"2\">LIBRE <br/>%.0f</td>\n", math.Round(porcentaje)))
+				porcentaje := float64(size-int(start)) / float64(size) * 100.0
+				fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"2\">LIBRE <br/> %.0f </td>\n\n", math.Round(porcentaje))
 				goto salida1
 			}
 			i--
@@ -162,28 +166,16 @@ func (r *Rep) ejecutarReporte_disk() {
 			if mbr.Mbr_partition[i].Part_type == 'e' {
 				contadorBloquesExtendida := 0
 				var ebr EBR
-				if _, err := fileReporte.Seek(int64(mbr.Mbr_partition[i].Part_start), 0); err != nil {
-					r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-					return
-				}
-				if err := binary.Read(fileReporte, binary.LittleEndian, &ebr); err != nil {
-					r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-					return
-				}
+				fileReporte.Seek(mbr.Mbr_partition[i].Part_start, 0)
+				binary.Read(fileReporte, binary.LittleEndian, &ebr)
 				if !(ebr.Part_s == -1 && ebr.Part_next == -1) {
 					if ebr.Part_s > -1 {
 						contadorBloquesExtendida += 2
 					} else {
 						contadorBloquesExtendida += 2
 					}
-					if _, err := fileReporte.Seek(int64(ebr.Part_next), 0); err != nil {
-						r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-						return
-					}
-					if err := binary.Read(fileReporte, binary.LittleEndian, &ebr); err != nil {
-						r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-						return
-					}
+					fileReporte.Seek(ebr.Part_next, 0)
+					binary.Read(fileReporte, binary.LittleEndian, &ebr)
 					for {
 						contadorBloquesExtendida += 2
 						if ebr.Part_next == -1 {
@@ -196,115 +188,102 @@ func (r *Rep) ejecutarReporte_disk() {
 								contadorBloquesExtendida++
 							}
 						}
-						if _, err := fileReporte.Seek(int64(ebr.Part_next), 0); err != nil {
-							r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-							return
-						}
-						if err := binary.Read(fileReporte, binary.LittleEndian, &ebr); err != nil {
-							r.singleton.AddSalidaConsola("NO SE PUDO LEER EL EBR DEL DISCO: " + err.Error())
-							return
-						}
+						fileReporte.Seek(ebr.Part_next, 0)
+						binary.Read(fileReporte, binary.LittleEndian, &ebr)
 					}
 				}
-				fmt.Fprintln(fileDot, "<td bgcolor=\"darkolivegreen1\" colspan=\""+string(contadorBloquesExtendida)+"\">EXTENDIDA</td>")
-			} else if mbr.Mbr_partition[i].Part_type == 'P' {
-				p1 := float32(mbr.Mbr_partition[i].Part_s) / float32(size)
-				porcentaje := p1 * 100.0
+				fmt.Fprintln(fileDot, "<td bgcolor=\"darkolivegreen1\" colspan=\""+strconv.Itoa(contadorBloquesExtendida)+"\">EXTENDIDA</td>")
+			} else if mbr.Mbr_partition[i].Part_type == 'p' {
+				p1 := float64(mbr.Mbr_partition[i].Part_s) / float64(size)
+				porcentaje := float64(p1) * 100.0
 				name1 := mbr.Mbr_partition[i].Part_name
-				fmt.Fprintf(fileDot, "<td bgcolor=violet rowspan=2>%s <br/>%d</td>", name1, int(math.Round(float64(porcentaje))))
+				fmt.Fprintf(fileDot, "<td bgcolor=\"violet\" rowspan=\"2\">%s <br/>%d</td>\n", string(bytes.TrimRight(name1[:], "\x00")), int(math.Round(float64(porcentaje))))
 				if i != 3 {
 					if mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s < mbr.Mbr_partition[i+1].Part_start {
-						porcentaje = (float32(mbr.Mbr_partition[i+1].Part_start-(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s)) / float32(size)) * 100
-						fmt.Fprintf(fileDot, "<td bgcolor=lavender rowspan=2>LIBRE <br/>%d</td>", int(math.Round(float64(porcentaje))))
+						porcentaje = (float64(mbr.Mbr_partition[i+1].Part_start-(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s)) / float64(size)) * 100
+						fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"2\">LIBRE <br/>%d</td>\n", int(math.Round(float64(porcentaje))))
 					}
 				} else if int(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s) < size {
-					porcentaje = (float32(size-(int(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s))) / float32(size)) * 100
-					fmt.Fprintf(fileDot, "<td bgcolor=lavender rowspan=2>LIBRE <br/>%d</td>", int(math.Round(float64(porcentaje))))
+					porcentaje = (float64(size-(int(mbr.Mbr_partition[i].Part_start+mbr.Mbr_partition[i].Part_s))) / float64(size)) * 100
+					fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"2\">LIBRE <br/>%d</td>\n", int(math.Round(float64(porcentaje))))
 				}
 			}
-			start = int64(mbr.Mbr_partition[i].Part_start + mbr.Mbr_partition[i].Part_s)
+			start = mbr.Mbr_partition[i].Part_start + mbr.Mbr_partition[i].Part_s
 		}
 		i++
 	}
 
 salida1:
-	fmt.Fprintln(fileDot, "</tr>\n")
+	fmt.Fprintln(fileDot, "</tr>")
+
 	// Por si hay extendida
 	i = 0
 	for i < 4 {
 		if mbr.Mbr_partition[i].Part_start != -1 {
 			if mbr.Mbr_partition[i].Part_type == 'e' {
-				fmt.Fprintf(fileDot, "<tr>\n")
+				fmt.Fprintln(fileDot, "<tr>")
 				porcentaje := (float64(mbr.Mbr_partition[i].Part_s) / float64(size)) * 100.0
 				var ebr EBR
-				if _, err := fileDot.Seek(int64(mbr.Mbr_partition[i].Part_start), 0); err != nil {
-					r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-					return
-				}
-				if err := binary.Read(fileDot, binary.LittleEndian, &ebr); err != nil {
-					r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-					return
-				}
+				fileReporte.Seek(mbr.Mbr_partition[i].Part_start, 0)
+				binary.Read(fileReporte, binary.LittleEndian, &ebr)
 				if !(ebr.Part_s == -1 && ebr.Part_next == -1) {
-					nombre_1 := strings.Trim(string(ebr.Part_name[:]), "\x00")
+					nombre1 := strings.Trim(string(ebr.Part_name[:]), "\x00")
 					if ebr.Part_s > -1 {
-						fmt.Fprintf(fileDot, "<td bgcolor=\"steelblue1\" rowspan=\"1\">EBR <br/> %s </td>", nombre_1)
+						fmt.Fprintf(fileDot, "<td bgcolor=\"steelblue1\" rowspan=\"1\">EBR <br/> %s </td>\n", string(bytes.TrimRight([]byte(nombre1[:]), "\x00")))
 						porcentaje = (float64(ebr.Part_s) / float64(size)) * 100.0
-						fmt.Fprintf(fileDot, "<td bgcolor=\"tan1\" rowspan=\"1\">Logica <br/> %d </td>", int(math.Round(porcentaje)))
+						fmt.Fprintf(fileDot, "<td bgcolor=\"tan1\" rowspan=\"1\">Logica <br/> %d </td>\n", int(math.Round(porcentaje)))
 					} else {
-						fmt.Fprintf(fileDot, "<td bgcolor=\"steelblue1\" rowspan=\"1\">EBR</td>")
+						fmt.Fprintln(fileDot, "<td bgcolor=\"steelblue1\" rowspan=\"1\">EBR</td>")
 						porcentaje = (float64(ebr.Part_next-ebr.Part_start) / float64(size)) * 100.0
-						fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"1\">Libre <br/> %d </td>", int(math.Round(porcentaje)))
+						fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"1\">Libre <br/> %d </td>\n", int(math.Round(porcentaje)))
 					}
-					if _, err := fileDot.Seek(int64(ebr.Part_next), 0); err != nil {
-						r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-						return
-					}
-					if err := binary.Read(fileDot, binary.LittleEndian, &ebr); err != nil {
-						r.singleton.AddSalidaConsola("ERROR AL LEER EL ARCHIVO: " + err.Error() + "\n")
-						return
-					}
+					fileReporte.Seek(ebr.Part_next, 0)
+					binary.Read(fileReporte, binary.LittleEndian, &ebr)
 					for {
 						name1 := ebr.Part_name
-						fmt.Fprintf(fileDot, "<td bgcolor=\"steelblue1\" rowspan=\"1\">EBR <br/>%s</td>", name1)
+						fmt.Fprintf(fileDot, "<td bgcolor=\"steelblue1\" rowspan=\"1\">EBR <br/>%s</td>\n", string(bytes.TrimRight(name1[:], "\x00")))
 						porcentaje := float64(ebr.Part_s) / float64(size) * 100.0
-						fmt.Fprintf(fileDot, "<td bgcolor=\"tan1\" rowspan=\"1\">Logica <br/>%d</td>", int(math.Round(porcentaje)))
+						fmt.Fprintf(fileDot, "<td bgcolor=\"tan1\" rowspan=\"1\">Logica <br/>%d</td>\n", int(math.Round(porcentaje)))
 						if ebr.Part_next == -1 {
 							if (ebr.Part_start + ebr.Part_s) < mbr.Mbr_partition[i].Part_s {
 								porcentaje = float64(mbr.Mbr_partition[i].Part_s-(ebr.Part_start+ebr.Part_s)) / float64(size) * 100.0
-								fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"1\">Libre <br/>%d</td>", int(math.Round(porcentaje)))
+								fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"1\">Libre <br/>%d</td>\n", int(math.Round(porcentaje)))
 							}
 							break
 						} else {
 							if (ebr.Part_start + ebr.Part_s) < ebr.Part_next {
 								porcentaje = float64(ebr.Part_next-(ebr.Part_start+ebr.Part_s)) / float64(size) * 100.0
-								fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"1\">Libre <br/>%d</td>", int(math.Round(porcentaje)))
+								fmt.Fprintf(fileDot, "<td bgcolor=\"lavender\" rowspan=\"1\">Libre <br/>%d</td>\n", int(math.Round(porcentaje)))
 							}
 						}
-						if _, err := fileReporte.Seek(int64(ebr.Part_next), io.SeekStart); err != nil {
-							log.Fatal(err)
-						}
-						if err := binary.Read(fileReporte, binary.LittleEndian, &ebr); err != nil {
-							log.Fatal(err)
-						}
+						fileReporte.Seek(ebr.Part_next, 0)
+						binary.Read(fileReporte, binary.LittleEndian, &ebr)
 					}
 				}
-				fmt.Fprintf(fileDot, "</tr>\n")
+				fmt.Fprintln(fileDot, "</tr>\n")
 			}
 		}
 		i++
 	}
+
 	fmt.Fprintln(fileDot, "</table>>];")
 	fmt.Fprintln(fileDot, "}")
 
 	if err := fileDot.Close(); err != nil {
-		r.singleton.AddSalidaConsola("NO SE PUDO CERRAR EL ARCHIVO PARA EL REPORTE: " + err.Error())
+		r.singleton.AddSalidaConsola("NO SE PUDO CERRAR EL ARCHIVO PARA EL REPORTE: " + err.Error() + "\n")
 		return
 	}
 
-	command := "dot -T" + r.Extension + " disk.dot -o \"" + r.Path + "\""
-	if _, err := exec.Command("sudo", "-S", command).Output(); err != nil {
-		r.singleton.AddSalidaConsola("NO SE PUDO GENERAR EL REPORTE: " + err.Error())
+	// Crea el comando para ejecutar graphviz usando el archivo .dot y la imagen
+	command := []string{"dot", "-T" + r.Extension, "disk.dot", "-o", r.Path}
+
+	// Crea el objeto cmd con la función Command
+	cmd := exec.Command("sudo", "-S", command[0], command[1], command[2], command[3], command[4])
+
+	// Ejecuta el comando y obtiene la salida combinada
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		r.singleton.AddSalidaConsola("NO SE PUDO GENERAR EL REPORTE: " + err.Error() + "\n")
 		return
 	}
 

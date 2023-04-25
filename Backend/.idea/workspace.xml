@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="reporte disk y estructuras mount">
-      <change afterPath="$PROJECT_DIR$/comandos/Montar.go" afterDir="false" />
+    <list default="true" id="aea5675b-2d4b-4457-83ed-1a68f85653eb" name="Changes" comment="arreglando errores de Go uffff">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analizador/Analizador.go" beforeDir="false" afterPath="$PROJECT_DIR$/analizador/Analizador.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/comandos/Disco.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Disco.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comandos/Particion.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Particion.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comandos/MountList.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/MountList.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/comandos/Rep.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Rep.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comandos/Structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/comandos/Structs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/singleton/Singleton.go" beforeDir="false" afterPath="$PROJECT_DIR$/singleton/Singleton.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,26 +35,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;ask.go.tool.to.install.GoGolangCILintTaskConsumer&quot;: &quot;true&quot;,
-    &quot;ask.go.tool.to.install.GoImportsTaskConsumer&quot;: &quot;true&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/diego-mazariegos/Escritorio/Proyectos_Oficiales/Go/prueba2&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.build.tools.auto.reload&quot;: &quot;ALL&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.smartKeys&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "ask.go.tool.to.install.GoGolangCILintTaskConsumer": "true",
+    "ask.go.tool.to.install.GoImportsTaskConsumer": "true",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "/home/diego-mazariegos/Escritorio/Proyectos_Oficiales/Go/MIA_PROYECTO2/Frontend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "rearrange.code.on.save": "true",
+    "settings.build.tools.auto.reload": "ALL",
+    "settings.editor.selected.configurable": "editor.preferences.smartKeys"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/singleton" />
@@ -117,9 +113,21 @@
     <MESSAGE value="mkdisk, rmdisk y comienzo fdisk" />
     <MESSAGE value="fdisk version1" />
     <MESSAGE value="reporte disk y estructuras mount" />
-    <option name="LAST_COMMIT_MESSAGE" value="reporte disk y estructuras mount" />
+    <MESSAGE value="arreglando errores de Go uffff" />
+    <option name="LAST_COMMIT_MESSAGE" value="arreglando errores de Go uffff" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/comandos/Rep.go</url>
+          <line>143</line>
+          <option name="timeStamp" value="52" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
